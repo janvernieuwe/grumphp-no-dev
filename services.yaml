@@ -1,0 +1,8 @@
+services:
+    Janvernieuwe\DevBranchCheck\DevelopmentBranchCheckTask:
+        class: Janvernieuwe\DevBranchCheck\DevelopmentBranchCheckTask
+        arguments:
+            - '@process_builder'
+            - '@formatter.raw_process'
+        tags:
+            - { name: grumphp.task, task: janvernieuwe_dev_branch }

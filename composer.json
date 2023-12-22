@@ -1,0 +1,27 @@
+{
+    "name": "janvernieuwe/dev-branch-check",
+    "description": "Checks for forgotten dev- branches in composer",
+    "type": "library",
+    "license": "Propriatary",
+    "autoload": {
+        "psr-4": {
+            "Janvernieuwe\\DevBranchCheck\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jan Vernieuwe",
+            "email": "jan.vernieuwe@phpro.be"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "symfony/options-resolver": "^6.3",
+        "phpro/grumphp": "^2.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpro/grumphp": true
+        }
+    }
+}
