@@ -2,7 +2,7 @@
     "name": "janvernieuwe/dev-branch-check",
     "description": "Checks for forgotten dev- branches in composer",
     "type": "library",
-    "license": "Propriatary",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Janvernieuwe\\DevBranchCheck\\": "src/"
