@@ -8,6 +8,11 @@
             "Janvernieuwe\\DevBranchCheck\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Janvernieuwe\\DevBranchCheck\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Jan Vernieuwe",
@@ -23,5 +28,8 @@
         "allow-plugins": {
             "phpro/grumphp": true
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
     }
 }
