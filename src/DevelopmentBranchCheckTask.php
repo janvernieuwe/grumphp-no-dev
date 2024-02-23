@@ -59,7 +59,11 @@ class DevelopmentBranchCheckTask implements TaskInterface
         $process->run();
 
         if (!$process->isSuccessful()) {
-            return TaskResult::createFailed($this, $context, $this->formatter->format($process));
+            $message = $this->formatter->format($process);
+            if($context instanceof GitPreCommitContext) {
+                return TaskResult::createNonBlockingFailed($this, $context, $message);
+            }
+            return TaskResult::createFailed($this, $context, $message);
         }
         $output = $process->getOutput();
         $dependencies = json_decode($output, true, 512, JSON_THROW_ON_ERROR);
