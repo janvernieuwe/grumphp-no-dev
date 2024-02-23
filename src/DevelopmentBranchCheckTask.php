@@ -82,6 +82,9 @@ class DevelopmentBranchCheckTask implements TaskInterface
         }
         $error = 'Following dev-* dependencies are not allowed: ' . implode(', ', $notAllowed);
 
+        if($context instanceof GitPreCommitContext) {
+            return TaskResult::createNonBlockingFailed($this, $context, $error);
+        }
         return TaskResult::createFailed($this, $context, $error);
     }
     private function validateDependency(array $dependency): bool
