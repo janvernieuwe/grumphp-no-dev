@@ -33,11 +33,13 @@ class DevelopmentBranchCheckTask implements TaskInterface
             'composer_file'    => 'composer.json',
             'triggered_by'     => ['composer.json', 'composer.lock', '*.php'],
             'allowed_packages' => [],
+            'fail_on_commit'   => true,
         ]);
 
         $resolver->addAllowedTypes('composer_file', ['string']);
         $resolver->addAllowedTypes('triggered_by', ['array']);
         $resolver->addAllowedTypes('allowed_packages', ['array']);
+        $resolver->addAllowedTypes('fail_on_commit', ['boolean']);
 
         return ConfigOptionsResolver::fromClosure(
             static fn(array $options): array => $resolver->resolve($options)
@@ -60,9 +62,7 @@ class DevelopmentBranchCheckTask implements TaskInterface
 
         if (!$process->isSuccessful()) {
             $message = $this->formatter->format($process);
-            if($context instanceof GitPreCommitContext) {
-                return TaskResult::createNonBlockingFailed($this, $context, $message);
-            }
+
             return TaskResult::createFailed($this, $context, $message);
         }
         $output = $process->getOutput();
@@ -82,11 +82,14 @@ class DevelopmentBranchCheckTask implements TaskInterface
         }
         $error = 'Following dev-* dependencies are not allowed: ' . implode(', ', $notAllowed);
 
-        if($context instanceof GitPreCommitContext) {
+        $failOnCommit = $this->config->getOptions()['fail_on_commit'] ?? true;
+        if ($context instanceof GitPreCommitContext && !$failOnCommit) {
             return TaskResult::createNonBlockingFailed($this, $context, $error);
         }
+
         return TaskResult::createFailed($this, $context, $error);
     }
+
     private function validateDependency(array $dependency): bool
     {
         return str_starts_with($dependency['version'], 'dev-') && $dependency['direct-dependency'];
