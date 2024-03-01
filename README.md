@@ -16,6 +16,7 @@ parameters:
         janvernieuwe_dev_branch:
             allowed_packages:
                 - roave/security-advisories # This is an example
+            fail_on_commit: false # Default true, allows for committingm wil still fail on CI
     extensions:
         - Janvernieuwe\DevBranchCheck\ExtensionLoader
 ```

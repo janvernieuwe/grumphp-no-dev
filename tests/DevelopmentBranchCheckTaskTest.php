@@ -4,6 +4,7 @@ namespace Janvernieuwe\DevBranchCheck\Tests;
 
 use GrumPHP\Formatter\ProcessFormatterInterface;
 use GrumPHP\Process\ProcessBuilder;
+use GrumPHP\Runner\TaskResult;
 use GrumPHP\Runner\TaskResultInterface;
 use GrumPHP\Task\Config\ConfigOptionsResolver;
 use GrumPHP\Task\Config\Metadata;
@@ -107,6 +108,46 @@ class DevelopmentBranchCheckTaskTest extends TestCase
         $result = $this->task->run($context);
         $this->assertInstanceOf(TaskResultInterface::class, $result);
         $this->assertTrue($result->hasFailed());
+        $this->assertEquals(TaskResult::FAILED, $result->getResultCode());
+
+    }
+
+    /**
+     * Test whether the process fails as expected when an unofficial dev dependency exists
+     * @covers \Janvernieuwe\DevBranchCheck\DevelopmentBranchCheckTask::run
+     */
+    public function testRunNoFailOnCommit(): void
+    {
+        $process = $this->createMock(Process::class);
+        $process->method('isSuccessful')->willReturn(true);
+        $output = [
+            'installed' => [
+                [
+                    'version'           => 'dev-master',
+                    'direct-dependency' => true,
+                    'name'              => 'disallowed/dev-package',
+                ],
+                [
+                    'version'           => 'dev-master',
+                    'direct-dependency' => true,
+                    'name'              => 'allowed/dev-package',
+                ],
+            ],
+        ];
+        $process->method('getOutput')->willReturn(json_encode($output, JSON_THROW_ON_ERROR));
+
+        $this->processBuilder->expects($this->once())->method('buildProcess')->willReturn($process);
+
+        $this->task = $this->task->withConfig(new TaskConfig(
+            name: 'janvernieuwe_dev_branch',
+            options: ['allowed_packages' => ['allowed/dev-package'], 'fail_on_commit' => false],
+            metadata: new Metadata([])
+        ));
+
+        $context = $this->createMock(GitPreCommitContext::class);
+        $result = $this->task->run($context);
+        $this->assertInstanceOf(TaskResultInterface::class, $result);
+        $this->assertEquals(TaskResult::NONBLOCKING_FAILED, $result->getResultCode());
     }
 
 
@@ -125,9 +166,11 @@ class DevelopmentBranchCheckTaskTest extends TestCase
         $this->assertArrayHasKey('composer_file', $configurableOptions);
         $this->assertArrayHasKey('triggered_by', $configurableOptions);
         $this->assertArrayHasKey('allowed_packages', $configurableOptions);
+        $this->assertArrayHasKey('fail_on_commit', $configurableOptions);
         $this->assertSame('composer.json', $configurableOptions['composer_file']);
         $this->assertSame(['composer.json', 'composer.lock', '*.php'], $configurableOptions['triggered_by']);
         $this->assertSame([], $configurableOptions['allowed_packages']);
+        $this->assertSame(true, $configurableOptions['fail_on_commit']);
     }
 
 
