@@ -21,7 +21,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "symfony/options-resolver": "^6.3",
+        "symfony/options-resolver": "^6.3 | ^7.0",
         "phpro/grumphp": "^2.0"
     },
     "config": {
